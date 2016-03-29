@@ -34,41 +34,10 @@ i => Perform case-insensitive matching.
 l => Make \w, \W, \b, \B, \s and \S dependent on the current locale.
 m => Multiline.
 s => Make the '.' special character match any character at all.
-u => Make \w, \W, \b, \B, \d, \D, \s and \S dependent on the Unicode character properties database.
+u => Make \w, \W, \b, \B, \d, \D, \s and \S '''
+        '''dependent on the Unicode character properties database.
 x => Verbose
 See also: https://docs.python.org/2/library/re.html#module-contents''')
-    '''
-
-
-Jpeg:
-rename:
-metarenamer --metadata --rename "{DateTimeOriginal:%%Y-%%m-%%d %%H:%%M:%%S} - {FileName}" --replace "i/img_/" "i/dscn/" "/_HDR/ hdr" "i/{DateTimeOriginal:%%Y-%%m-%%d %%H:%%M:%%S} - {DateTimeOriginal:%%Y-%%m-%%d %%H:%%M:%%S} - /{DateTimeOriginal:%%Y-%%m-%%d %%H:%%M:%%S} - " "i/{DateTimeOriginal:%%Y-%%m-%%d %%H:%%M:%%S} - {DateTimeOriginal:%%Y%%m%%d}_/{DateTimeOriginal:%%Y-%%m-%%d %%H:%%M:%%S} - " --ignore-dir @eaDir
-move:
-metarenamer --metadata --move-to "{DateTimeOriginal:%%Y}/{DateTimeOriginal:%%m %%B}" --rename "{DateTimeOriginal:%%Y-%%m-%%d %%H:%%M:%%S} - {FileName}" --replace "i/ - IMG_[0-9]{4}\.jpg/.jpeg" --ignore-dir @eaDir
-rm dupplicate:
-metarenamer --metadata --replace "i/{DateTimeOriginal:%%Y-%%m-%%d %%H:%%M:%%S} - {DateTimeOriginal:%%Y-%%m-%%d %%H:%%M:%%S} - /{DateTimeOriginal:%%Y-%%m-%%d %%H:%%M:%%S} - " --ignore-dir @eaDir
-Jpeg errors:
-metarenamer --dry-run --replace "/20[01][0-9].*20[01][0-9]/" --ignore-dir @eaDir
-Video Mov:
-metarenamer --metadata --move-to "{MediaCreateDate:%%Y}/{MediaCreateDate:%%m %%B}" --rename "{MediaCreateDate:%%Y-%%m-%%d %%H:%%M:%%S} - {FileName}" --ignore-dir @eaDir
-
-MediaCreateDate
-MP3:
-metarenamer --jinja --metadata --move-to "{{ m.get('Genre', 'undefined').replace('/', '-') }} - {{ m.get('Artist', m.get('AlbumArtist', 'undefined')).replace('/', '-') }}/{{ m.get('Year', '0000') }} - {{ m.get('Album', m.get('AlbumTitle', 'undefined')).replace('/', '-') }}" --rename "{{ format_num_on_demon(m.get('Track')).replace('/', '-') }} - {%% if m.get('Title', '') == '' %%}{{ m.get('FileName', 'undefined').replace('/', '-') }}{%% else %%}{{ m.get('Title', 'undefined').replace('/', '-') }}{%% endif %%}.{{ m.get('FileType').lower() }}" --replace "/ Piste [0-9]*/" "/.{{ m.get('FileType').lower() }}.{{ m.get('FileType').lower() }}/.{{ m.get('FileType').lower() }}" "/_/ " "/  \+/ " --ignore-dir @eaDir
-Some fix:
-metarenamer --replace "i/_HDR/ hdr" "i/^img_/"  "i/^dsc_/" "/_/ " "/  / " "i/\.nef$/.nef" "i/\.jpg$/.jpeg" "i/\.jpg\.jpeg/.jpeg" "i/\.CR2/.cr2" --ignore-dir @eaDir
-
-SetMatadata:
-metarenamer --metadata --meta-name DateTimeOriginal --meta-value "/(20[01][0-9])([0-9]{2})([0-9]{2}) ([0-9]{2})([0-9]{2})([0-9]{2})/\1-\2-\3 \4:\5:\6" *.jpeg
-metarenamer --metadata --meta-name MediaCreateDate --meta-value "/(20[01][0-9])([0-9]{2})([0-9]{2}) ([0-9]{2})([0-9]{2})([0-9]{2})/\1-\2-\3 \4:\5:\6" *.mp
-
-
-IMG-20140930-WA0000.jpeg
-VID-20140531-WA0000.mp4
-Laetitia phone WhatsApp Media WhatsApp Images Sent 20140930-WA0000.jpeg
-Laetitia phone WhatsApp Media WhatsApp Video 20140531-WA0000.mp4
-
-'''
     parser.add_argument(
         'directory', nargs='*', default=['.'],
         help='root foldrers'
@@ -116,7 +85,10 @@ Laetitia phone WhatsApp Media WhatsApp Video 20140531-WA0000.mp4
     job_files = []
     process = Process()
 
-    for f, _ in files(args.directory, args.ignore_dir or metatask.config.get('ignore_dir', []), args.filename):
+    for f, _ in files(
+        args.directory, args.ignore_dir or
+        metatask.config.get('ignore_dir', []), args.filename
+    ):
         if os.path.isfile(f):
             try:
                 metadata = None
@@ -126,15 +98,23 @@ Laetitia phone WhatsApp Media WhatsApp Video 20140531-WA0000.mp4
                         print(json.dumps(metadata, indent=4))
                         exit()
 
-                full_dest, extension, task = process.destination_filename(args.task, f)
+                full_dest, extension, task = process.destination_filename(
+                    args.task, f
+                )
 
                 if f != full_dest:
                     print_diff(f, full_dest)
                     if os.path.exists(full_dest):
-                        sys.stderr.write(colorize("Destination already exists", RED))
+                        sys.stderr.write(colorize(
+                            "Destination already exists", RED
+                        ))
                         continue
-                    elif len([i for i in job_files if i[1] == full_dest]) != 0:
-                        sys.stderr.write(colorize("Destination will already exists", RED))
+                    elif len([
+                        i for i in job_files if i[1] == full_dest
+                    ]) != 0:
+                        sys.stderr.write(colorize(
+                            "Destination will already exists", RED
+                        ))
                         continue
                 elif task is True:
                     print(colorize(f, BLUE))

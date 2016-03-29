@@ -26,7 +26,7 @@ class Process(QObject):
             if filename != dst:
                 shutil.move(filename, dst)
             return
-            
+
         if cmds.get(names[0]).get("inplace") is True:
             if in_extention is None:
                 out_name = NamedTemporaryFile(mode='w+b').name
@@ -128,8 +128,13 @@ class Process(QObject):
                     return term.upper()
                 else:
                     return term.lower()
-            to_re = lambda m: format_term(m.group(0))
-        return re.sub(from_re, to_re, destination_filename)
+            return re.sub(
+                from_re,
+                lambda m: format_term(m.group(0)),
+                destination_filename
+            )
+        else:
+            return re.sub(from_re, to_re, destination_filename)
 
     def destination_filename(self, names, filename, extension=None):
         cmds = edocuments.config.get("cmds", {})

@@ -61,7 +61,9 @@ def files(directories, ignore_dir, filenames=['.*']):
                 for f_ in files:
                     for filename in filenames:
                         if re.match(filename, f_):
-                            full_path = re.sub("^\./", "", os.path.join(path, f_))
+                            full_path = re.sub(
+                                "^\./", "", os.path.join(path, f_)
+                            )
                             yield full_path, f_
                             break
         elif os.path.isfile(directory):
@@ -109,17 +111,25 @@ def confirm(prompt=None, resp=False):
 
 
 def read_metadata(filename, read_types):
-    metadata = json.loads(str(subprocess.check_output(["/usr/bin/exiftool", "-json", filename]), encoding='utf-8', errors='strict'))[0]
+    metadata = json.loads(str(subprocess.check_output([
+        "/usr/bin/exiftool", "-json", filename
+    ]), encoding='utf-8', errors='strict'))[0]
     if read_types:
         for k in metadata.keys():
             if type(metadata[k]) == str:
                 try:
-                    metadata[k] = datetime.datetime.strptime(metadata[k], "%Y:%m:%d %H:%M:%S")
+                    metadata[k] = datetime.datetime.strptime(
+                        metadata[k], "%Y:%m:%d %H:%M:%S"
+                    )
                 except ValueError:
                     try:
-                        metadata[k] = datetime.datetime.strptime(metadata[k], "%Y:%m:%d %H:%M:%S%z")
+                        metadata[k] = datetime.datetime.strptime(
+                            metadata[k], "%Y:%m:%d %H:%M:%S%z"
+                        )
                     except ValueError:
                         try:
-                            metadata[k] = datetime.datetime.strptime(metadata[k], "%d/%m/%Y %H:%M:%S")
+                            metadata[k] = datetime.datetime.strptime(
+                                metadata[k], "%d/%m/%Y %H:%M:%S"
+                            )
                         except ValueError:
                             pass
