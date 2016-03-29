@@ -10,6 +10,7 @@ README = (
 )
 
 install_requires = [
+    "bashcolor"
 ]
 
 setup_requires = [
