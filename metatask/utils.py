@@ -2,7 +2,11 @@
 
 import os
 import re
+import json
+import datetime
+import subprocess
 from edocuments.colorize import colorize, RED, GREEN, REVERSE
+
 
 def common_start(str1, str2):
 
@@ -62,7 +66,7 @@ def files(directories, ignore_dir, filenames=['.*']):
                             break
         elif os.path.isfile(directory):
             yield directory, os.path.split(directory)[-1]
-            
+
 
 def confirm(prompt=None, resp=False):
     """
@@ -73,16 +77,16 @@ def confirm(prompt=None, resp=False):
     user simply types ENTER.
 
     >>> confirm(prompt='Create Directory?', resp=True)
-    Create Directory? [y]|n: 
+    Create Directory? [y]|n:
     True
     >>> confirm(prompt='Create Directory?', resp=False)
-    Create Directory? [n]|y: 
+    Create Directory? [n]|y:
     False
     >>> confirm(prompt='Create Directory?', resp=False)
     Create Directory? [n]|y: y
     True
     """
-    
+
     if prompt is None:
         prompt = "Confirm"
 
@@ -90,7 +94,7 @@ def confirm(prompt=None, resp=False):
         prompt = "%s [%s]|%s: " % (prompt, "y", "n")
     else:
         prompt = "%s [%s]|%s: " % (prompt, "n", "y")
-        
+
     while True:
         ans = input(prompt)
         if not ans:
@@ -105,18 +109,17 @@ def confirm(prompt=None, resp=False):
 
 
 def read_metadata(filename, read_types):
-    metadata = json.loads(str(subprocess.check_output(["/usr/bin/exiftool", "-json", f]), encoding='utf-8', errors='strict'))[0]
+    metadata = json.loads(str(subprocess.check_output(["/usr/bin/exiftool", "-json", filename]), encoding='utf-8', errors='strict'))[0]
     if read_types:
-        if args.meta_name is not None and args.meta_value is not None:
-            for k in metadata.keys():
-                if type(metadata[k]) == str:
+        for k in metadata.keys():
+            if type(metadata[k]) == str:
+                try:
+                    metadata[k] = datetime.datetime.strptime(metadata[k], "%Y:%m:%d %H:%M:%S")
+                except ValueError:
                     try:
-                        metadata[k] = datetime.datetime.strptime(metadata[k], "%Y:%m:%d %H:%M:%S")
+                        metadata[k] = datetime.datetime.strptime(metadata[k], "%Y:%m:%d %H:%M:%S%z")
                     except ValueError:
                         try:
-                            metadata[k] = datetime.datetime.strptime(metadata[k], "%Y:%m:%d %H:%M:%S%z")
+                            metadata[k] = datetime.datetime.strptime(metadata[k], "%d/%m/%Y %H:%M:%S")
                         except ValueError:
-                            try:
-                                metadata[k] = datetime.datetime.strptime(metadata[k], "%d/%m/%Y %H:%M:%S")
-                            except ValueError:
-                                pass
+                            pass
