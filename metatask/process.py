@@ -21,11 +21,12 @@ class Process(QObject):
         cmds = edocuments.config.get("cmds", {})
         out_ext = in_extention
 
-        dst, extension, task = self.destination_filename(names, filename)
-        if task is False:
-            if filename != dst:
-                shutil.move(filename, dst)
-            return
+        if filename is not None:
+            dst, extension, task = self.destination_filename(names, filename)
+            if task is False:
+                if filename != dst:
+                    shutil.move(filename, dst)
+                return
 
         if cmds.get(names[0]).get("inplace") is True:
             if in_extention is None:

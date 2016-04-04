@@ -8,7 +8,7 @@ import argparse
 import locale
 import metatask
 from metatask.process import Process
-from metatask.utils.common import files, read_metadata, print_diff, confirm
+from metatask.utils import files, read_metadata, print_diff, confirm
 from bashcolor import colorize, RED, BLUE
 from concurrent.futures import ThreadPoolExecutor, as_completed
 

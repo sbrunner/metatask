@@ -5,7 +5,7 @@ import re
 import json
 import datetime
 import subprocess
-from edocuments.colorize import colorize, RED, GREEN, REVERSE
+from bashcolor import colorize, RED, GREEN, INVERSE
 
 
 def common_start(str1, str2):
@@ -41,12 +41,12 @@ def print_diff(str1, str2):
 
     print("- %s%s%s" % (
         colorize(start, RED),
-        colorize(colorize(different(str1, start, end), REVERSE), RED),
+        colorize(colorize(different(str1, start, end), INVERSE), RED),
         colorize(end, RED)
     ))
     print("+ %s%s%s" % (
         colorize(start, GREEN),
-        colorize(colorize(different(str2, start, end), REVERSE), GREEN),
+        colorize(colorize(different(str2, start, end), INVERSE), GREEN),
         colorize(end, GREEN)
     ))
 
