@@ -39,16 +39,16 @@ def print_diff(str1, str2):
     if len(start) + len(end) > len(small_str):
         end = end[len(start) + len(end) - len(small_str):]
 
-    print("- %s%s%s" % (
-        colorize(start, RED),
-        colorize(colorize(different(str1, start, end), INVERSE), RED),
-        colorize(end, RED)
-    ))
-    print("+ %s%s%s" % (
-        colorize(start, GREEN),
-        colorize(colorize(different(str2, start, end), INVERSE), GREEN),
-        colorize(end, GREEN)
-    ))
+    print("- %s" % colorize("%s%s%s" % (
+        start,
+        colorize(different(str1, start, end), effects=[INVERSE]),
+        end,
+    ), RED))
+    print("- %s" % colorize("%s%s%s" % (
+        start,
+        colorize(different(str2, start, end), effects=[INVERSE]),
+        end,
+    ), GREEN))
 
 
 def files(directories, ignore_dir, filenames=['.*']):
