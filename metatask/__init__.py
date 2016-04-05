@@ -20,7 +20,7 @@ def main():
         description='Rename the file using metadata.',
         usage='''
 Task to do:
-name: Predifined command in the config file.
+name: Predefined command in the config file.
 TODO:
 rename/<new name>/<flag>
 replace/<old>/<new>/<flag>
