@@ -3,6 +3,7 @@
 import sys
 import os
 import json
+import yaml
 import subprocess
 import argparse
 import locale
@@ -13,12 +14,25 @@ from bashcolor import colorize, RED, BLUE
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
+CONFIG_FILENAME = "metatask.yaml"
+
+if 'APPDATA' in os.environ:
+    CONFIG_PATH = os.path.join(os.environ['APPDATA'], CONFIG_FILENAME)
+elif 'XDG_CONFIG_HOME' in os.environ:
+    CONFIG_PATH = os.path.join(os.environ['XDG_CONFIG_HOME'], CONFIG_FILENAME)
+else:
+    CONFIG_PATH = os.path.join(os.environ['HOME'], '.config', CONFIG_FILENAME)
+
+config = {}
+
+
 def main():
     locale.setlocale(locale.LC_ALL, locale.getdefaultlocale())
 
     parser = argparse.ArgumentParser(
         description='Rename the file using metadata.',
-        usage='''
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog='''
 Task to do:
 name: Predefined command in the config file.
 TODO:
@@ -129,6 +143,14 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
         progress.run_all(job_files)
 
 
+def init(config_file):
+    global config
+    if config_file is None:
+        config_file = CONFIG_PATH
+    with open(config_file) as f:
+        config = yaml.load(f.read())
+
+
 class Progress:
     def __init__(self, nb, cmds, process):
         self.nb = nb
@@ -151,6 +173,7 @@ class Progress:
                 f for f in job_files
             }
             for feature in as_completed(future_results):
+                feature.result()
                 pass
 
 if __name__ == "__main__":

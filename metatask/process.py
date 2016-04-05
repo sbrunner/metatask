@@ -4,11 +4,11 @@
 import os
 import re
 import shutil
+import metatask
 from tempfile import NamedTemporaryFile
 from subprocess import check_call
 from shutil import copyfile
 from PyQt5.QtCore import QObject, pyqtSignal
-import edocuments
 
 
 class Process(QObject):
@@ -18,12 +18,14 @@ class Process(QObject):
     def process(
             self, names, filename=None, destination_filename=None,
             in_extention=None, get_content=False):
-        cmds = edocuments.config.get("cmds", {})
+        cmds = metatask.config.get("cmds", {})
         out_ext = in_extention
 
         if filename is not None:
-            dst, extension, task = self.destination_filename(names, filename)
-            if task is False:
+            dst, extension, types = self.destination_filename(names, filename)
+            if types == set():
+                return
+            if types == set(["rename"]):
                 if filename != dst:
                     shutil.move(filename, dst)
                 return
@@ -138,8 +140,8 @@ class Process(QObject):
             return re.sub(from_re, to_re, destination_filename)
 
     def destination_filename(self, names, filename, extension=None):
-        cmds = edocuments.config.get("cmds", {})
-        task = False
+        cmds = metatask.config.get("cmds", {})
+        types = set()
 
         for name in names:
             cmd = cmds.get(name)
@@ -148,6 +150,8 @@ class Process(QObject):
 
             if isinstance(cmd, str):
                 cmd = {}  # TODO fix
+
+            types.add(cmd.get('type'))
 
             if cmd.get('type') == 'rename':
                 if "do" in cmd:
@@ -158,11 +162,10 @@ class Process(QObject):
             else:
                 if 'out_ext' in cmd:
                     extension = cmd['out_ext']
-                task = True
 
         if extension is not None:
             filename = "%s.%s" % (re.sub(
                 r"\.[a-z0-9A-Z]{2,5}$", "",
                 filename
             ), extension)
-        return filename, extension, task
+        return filename, extension, types
