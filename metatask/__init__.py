@@ -89,7 +89,7 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
         help='Tasks we want to do',
     )
     parser.add_argument(
-        '--list-tasks', action='store_true'
+        '--list-tasks', action='store_true',
         help='List the available tasks'
     )
     parser.add_argument(
@@ -104,7 +104,7 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
     process = Process()
 
     if args.list_tasks:
-        for name, cmd in metatask.config.get("cmds", {}).items()
+        for name, cmd in metatask.config.get("cmds", {}).items():
             print("{}: {}".format(
                 colorize(name, GREEN), cmd.get("name", "")
             ))
