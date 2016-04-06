@@ -107,8 +107,8 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
             try:
                 metadata = None
                 if args.metadata or args.view or len([
-                    cmd for cmd in metatask.config.get("cmds", {})
-                    if cmd.get("metadata", False) is True
+                    name for name, cmd in metatask.config.get("cmds", {}).items()
+                    if cmd.get("metadata", False) is True and name in args.tasks
                 ]) > 0:
                     metadata = read_metadata(f, args.view)
                     if args.view:
