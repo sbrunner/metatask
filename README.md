@@ -19,7 +19,7 @@ chains:
         display: <text>
         source-mime: <mimie type>
         commands: [<list of commands>]
-        
+
 cmds:
     <name>:
         display: <text>
