@@ -106,7 +106,10 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
         if os.path.isfile(f):
             try:
                 metadata = None
-                if args.metadata or args.view:
+                if args.metadata or args.view or len([
+                    cmd for cmd in metatask.config.get("cmds", {})
+                    if cmd.get("metadata", False) is True
+                ]) > 0:
                     metadata = read_metadata(f, args.view)
                     if args.view:
                         print(json.dumps(metadata, indent=4))
