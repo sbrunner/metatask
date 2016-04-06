@@ -10,7 +10,7 @@ import locale
 import metatask
 from metatask.process import Process
 from metatask.utils import files, read_metadata, print_diff, confirm
-from bashcolor import colorize, RED, BLUE
+from bashcolor import colorize, RED, BLUE, GREEN
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
@@ -85,8 +85,12 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
         help='just see the diff'
     )
     parser.add_argument(
-        '--task', nargs='*', default=[],
-        help='What we want to do',
+        '--tasks', nargs='*', default=[],
+        help='Tasks we want to do',
+    )
+    parser.add_argument(
+        '--list-tasks', action='store_true'
+        help='List the available tasks'
     )
     parser.add_argument(
         '--config-file', default=None,
@@ -98,6 +102,13 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
     metatask.init(args.config_file)
     job_files = []
     process = Process()
+
+    if args.list_tasks:
+        for name, cmd in metatask.config.get("cmds", {}).items()
+            print("{}: {}".format(
+                colorize(name, GREEN), cmd.get("name", "")
+            ))
+            exit()
 
     for f, _ in files(
         args.directory, args.ignore_dir or
