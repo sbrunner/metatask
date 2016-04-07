@@ -36,6 +36,7 @@ class Process(QObject):
                     shutil.move(filename, dst)
                 return
 
+        original_filename = filename
         if cmds.get(names[0]).get("inplace") is True:
             if in_extention is None:
                 out_name = NamedTemporaryFile(mode='w+b').name
@@ -47,7 +48,6 @@ class Process(QObject):
             shutil.copyfile(filename, out_name)
             filename = out_name
 
-        original_filename = filename
         if destination_filename is None:
             destination_filename = filename
         for no, name in enumerate(names):
@@ -99,6 +99,8 @@ class Process(QObject):
                 self.progress.emit(no, name, cmd_cmd, cmd)
                 check_call(cmd_cmd, shell=True)
 
+                if filename != original_filename:
+                    os.unlink(filename)
                 filename = out_name
 
         if get_content:
