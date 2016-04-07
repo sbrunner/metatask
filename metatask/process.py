@@ -27,6 +27,9 @@ class Process(QObject):
                 return
             if types == set(["rename"]):
                 if filename != dst:
+                    directory = os.path.dirname(dst)
+                    if not os.path.exists(directory):
+                        os.makedirs(directory)
                     shutil.move(filename, dst)
                 return
 
