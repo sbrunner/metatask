@@ -127,7 +127,7 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
                         exit()
 
                 full_dest, extension, task = process.destination_filename(
-                    args.task, f
+                    args.tasks, f
                 )
 
                 if f != full_dest:
@@ -153,7 +153,7 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
                 sys.stderr.write("Error on getting metadata on '%s'.\n" % f)
 
     if len(job_files) != 0 and not args.dry_run and (args.apply or confirm()):
-        progress = Progress(len(job_files), args.task, process)
+        progress = Progress(len(job_files), args.tasks, process)
         progress.run_all(job_files)
 
 
