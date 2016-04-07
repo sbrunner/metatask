@@ -121,13 +121,13 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
                     name for name, cmd in metatask.config.get("cmds", {}).items()
                     if cmd.get("metadata", False) is True and name in args.tasks
                 ]) > 0:
-                    metadata = read_metadata(f, args.view)
+                    metadata = read_metadata(f, not args.view)
                     if args.view:
                         print(json.dumps(metadata, indent=4))
                         exit()
 
                 full_dest, extension, task = process.destination_filename(
-                    args.tasks, f
+                    args.tasks, f, metadata=metadata
                 )
 
                 if f != full_dest:
@@ -148,7 +148,7 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
                     print(colorize(f, BLUE))
                 else:
                     continue
-                job_files.append(f)
+                job_files.append((f, metadata))
             except subprocess.CalledProcessError:
                 sys.stderr.write("Error on getting metadata on '%s'.\n" % f)
 
@@ -172,8 +172,8 @@ class Progress:
         self.cmds = cmds
         self.process = process
 
-    def run(self, filename):
-        result = self.process.process(self.cmds, filename)
+    def run(self, filename, metadata):
+        result = self.process.process(self.cmds, filename, metadata=metadata)
         self.no += 1
         print("%i/%i" % (self.no, self.nb))
         return result
@@ -183,8 +183,8 @@ class Progress:
             max_workers=metatask.config.get('nb_process', 8)
         ) as executor:
             future_results = {
-                executor.submit(self.run, f):
-                f for f in job_files
+                executor.submit(self.run, f, metadata):
+                f for f, metadata in job_files
             }
             for feature in as_completed(future_results):
                 feature.result()

@@ -19,12 +19,12 @@ class Process(QObject):
 
     def process(
             self, names, filename=None, destination_filename=None,
-            in_extention=None, get_content=False):
+            in_extention=None, get_content=False, metadata={}):
         cmds = metatask.config.get("cmds", {})
         out_ext = in_extention
 
         if filename is not None:
-            dst, extension, types = self.destination_filename(names, filename)
+            dst, extension, types = self.destination_filename(names, filename, metadata=metadata)
             if types == set():
                 return
             if types == set(["rename"]):
@@ -59,7 +59,7 @@ class Process(QObject):
                 cmd = dict(cmd=cmd)
 
             if cmd.get('type') == 'rename':
-                destination_filename = self._rename(cmd, destination_filename)
+                destination_filename = self._rename(cmd, destination_filename, metadata)
             else:
                 if 'out_ext' in cmd:
                     out_ext = cmd['out_ext']
@@ -130,8 +130,8 @@ class Process(QObject):
 
             return destination_filename, out_ext
 
-    def _rename(self, cmd, destination_filename):
-        from_re = cmd.get('from')
+    def _rename(self, cmd, destination_filename, metadata):
+        from_re = cmd.get('from', '.*')
         to_re = cmd.get('to')
         format_ = cmd.get('format')
         if format_ in ['upper', 'lower']:
@@ -146,9 +146,9 @@ class Process(QObject):
                 destination_filename
             )
         else:
-            return re.sub(from_re, to_re, destination_filename)
+            return re.sub(from_re, to_re.format(**metadata), destination_filename)
 
-    def destination_filename(self, names, filename, extension=None):
+    def destination_filename(self, names, filename, extension=None, metadata={}):
         cmds = metatask.config.get("cmds", {})
         types = set()
 
@@ -165,9 +165,9 @@ class Process(QObject):
             if cmd.get('type') == 'rename':
                 if "do" in cmd:
                     for do in cmd["do"]:
-                        filename = self._rename(do, filename)
+                        filename = self._rename(do, filename, metadata)
                 else:
-                    filename = self._rename(cmd, filename)
+                    filename = self._rename(cmd, filename, metadata)
             else:
                 if 'out_ext' in cmd:
                     extension = cmd['out_ext']

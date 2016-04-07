@@ -120,11 +120,11 @@ def confirm(prompt=None, resp=False):
             return False
 
 
-def read_metadata(filename, read_types):
+def read_metadata(filename, read_types=True):
     metadata = json.loads(str(subprocess.check_output([
         "/usr/bin/exiftool", "-json", filename
     ]), encoding='utf-8', errors='strict'))[0]
-    if read_types:
+    if read_types is True:
         for k in metadata.keys():
             if type(metadata[k]) == str:
                 try:
@@ -143,3 +143,4 @@ def read_metadata(filename, read_types):
                             )
                         except ValueError:
                             pass
+    return metadata
