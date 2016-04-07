@@ -4,6 +4,7 @@
 import os
 import re
 import shutil
+import threading
 import metatask
 from tempfile import NamedTemporaryFile
 from subprocess import check_call
@@ -14,6 +15,7 @@ from PyQt5.QtCore import QObject, pyqtSignal
 class Process(QObject):
     progress = pyqtSignal(int, str, str, dict)
     cancel = False
+    lock = threading.Lock()
 
     def process(
             self, names, filename=None, destination_filename=None,
@@ -28,8 +30,9 @@ class Process(QObject):
             if types == set(["rename"]):
                 if filename != dst:
                     directory = os.path.dirname(dst)
-                    if not os.path.exists(directory):
-                        os.makedirs(directory)
+                    with self.lock:
+                        if not os.path.exists(directory):
+                            os.makedirs(directory)
                     shutil.move(filename, dst)
                 return
 
@@ -116,8 +119,9 @@ class Process(QObject):
                 ), out_ext)
             if filename != destination_filename:
                 directory = os.path.dirname(destination_filename)
-                if not os.path.exists(directory):
-                    os.makedirs(directory)
+                with self.lock:
+                    if not os.path.exists(directory):
+                        os.makedirs(directory)
 
                 copyfile(filename, destination_filename)
                 os.unlink(filename)
