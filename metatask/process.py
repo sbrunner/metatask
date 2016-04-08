@@ -19,7 +19,7 @@ class Process(QObject):
 
     def process(
             self, names, filename=None, destination_filename=None,
-            in_extention=None, get_content=False, metadata={}):
+            in_extention=None, get_content=False, metadata=None):
         cmds = metatask.config.get("cmds", {})
         out_ext = in_extention
 
@@ -146,9 +146,14 @@ class Process(QObject):
                 destination_filename
             )
         else:
-            return re.sub(from_re, to_re.format(**metadata), destination_filename)
+            do_metadata = cmd.get('metadata', False) is True and metadata is not None
+            return re.sub(
+                from_re,
+                to_re.format(**metadata) if do_metadata is not None else to_re,
+                destination_filename
+            )
 
-    def destination_filename(self, names, filename, extension=None, metadata={}):
+    def destination_filename(self, names, filename, extension=None, metadata=None):
         cmds = metatask.config.get("cmds", {})
         types = set()
 
