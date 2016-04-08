@@ -38,7 +38,7 @@ class Process(QObject):
     lock = threading.Lock()
 
     def process(
-            self, names, filename=None, destination_filename=None,
+            self, names, filenames=None, destination_filename=None,
             in_extention=None, get_content=False, metadata=None):
         out_ext = in_extention
         cmds_config = metatask.config.get("cmds", {})
@@ -51,6 +51,9 @@ class Process(QObject):
                 cmds.append(c)
             else:
                 cmds.append(cmd)
+
+        if isinstance(filenames, list):
+            filename = filenames[0]
 
         if filename is not None:
             dst, extension, types, messages = self.destination_filename(names, filename, metadata=metadata)
@@ -120,7 +123,14 @@ class Process(QObject):
                 if metadata is not None:
                     params.update(metadata)
 
-                if filename is not None:
+                # it's a merge
+                if isinstance(filenames, list):
+                    params["in"] = " ".join([
+                        "'%s'" % f.replace("'", "'\"'\"'") for f in filenames
+                    ])
+                    # do the merge only one time
+                    filenames = None
+                elif filename is not None:
                     params["in"] = "'%s'" % filename.replace("'", "'\"'\"'")
 
                 if not inplace:
@@ -221,7 +231,7 @@ class Process(QObject):
         messages = []
 
         for cmd in cmds:
-            types.add(cmd.get('type'))
+            types.add(cmd.get('type', 'cmd'))
 
             if cmd.get('type') == 'rename':
                 if "do" in cmd:

@@ -9,15 +9,20 @@ from bashcolor import colorize, RED, GREEN, INVERSE
 
 
 def common_start(str1, str2):
+    strs []
+    strs += str1
+    strs.append(str2)
 
-    if len(str2) > len(str1):
-        str1, str2 = (str2, str1)
+    strs.sort(key=lambda e: len(e))
+    str1 = strs[0]
+    strs = strs[1:]
 
     start = ""
 
-    for index in range(len(str2)):
-        if str1[index] != str2[index]:
-            break
+    for index in range(len(str1)):
+        for s in strs:
+            if str1[index] != str[index]:
+                break
         start += str1[index]
 
     return start
@@ -31,20 +36,23 @@ def different(str_, start, end):
 
 
 def print_diff(str1, str2):
+    if not typeof(str1, list):
+        str1 = [str1]
     start = common_start(str1, str2)
-    end = common_start(str1[::-1], str2[::-1])[::-1]
+    end = common_start([s[::-1] for s in str1], str2[::-1])[::-1]
 
     # Fix end that recover start ...
     small_str = str1 if len(str1) < len(str2) else str2
     if len(start) + len(end) > len(small_str):
         end = end[len(start) + len(end) - len(small_str):]
 
-    print("- %s" % colorize("%s%s%s" % (
-        start,
-        colorize(different(str1, start, end), effects=[INVERSE]),
-        end,
-    ), RED))
-    print("- %s" % colorize("%s%s%s" % (
+    for s in str1:
+        print("- %s" % colorize("%s%s%s" % (
+            start,
+            colorize(different(s, start, end), effects=[INVERSE]),
+            end,
+        ), RED))
+    print("+ %s" % colorize("%s%s%s" % (
         start,
         colorize(different(str2, start, end), effects=[INVERSE]),
         end,

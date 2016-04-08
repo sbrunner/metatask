@@ -104,7 +104,6 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
 
     metatask.init(args.config_file)
     job_files = []
-    dest_files = []
     process = Process()
 
     if args.list_cmds:
@@ -120,10 +119,13 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
             ))
             exit()
 
+    merge = False
     cmds = []
     cmds_config = metatask.config.get("cmds", {})
     if args.task is not None:
-        for cmd in metatask.config.get("tasks", {}).get(args.task, {}).get("cmds", []):
+        task = metatask.config.get("tasks", {}).get(args.task, {})
+        merge = task.get(merge, False) is True
+        for cmd in task.get("cmds", []):
             if isinstance(cmd, str):
                 c = cmds_config.get(cmd)
                 if c is None:
@@ -148,25 +150,32 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
                     raise Exception("Missing command '%s' in `cmds`" % cmd)
                 cmds.append(c)
 
-    for f, _ in files(
+    file_list = files(
         args.directory, args.ignore_dir or
         metatask.config.get('ignore_dir', []), args.filename
-    ):
+    )
+    if merge:
         if os.path.isfile(f):
-            try:
-                metadata = None
-                if args.metadata or args.view or len([
-                    name for name, cmd in metatask.config.get("cmds", {}).items()
-                    if cmd.get("metadata", False) is True and name in args.cmds
-                ]) > 0:
-                    metadata = read_metadata(f, not args.view)
-                    if args.view:
-                        print(json.dumps(metadata, indent=4))
-                        exit()
+            full_dest, types, messages = _process_file(f)
 
-                full_dest, extension, types, messages = process.destination_filename(
-                    args.cmds, f, metadata=metadata
-                )
+            if 'cmd' not in types:
+                exit("A merge process should have a cmd")
+
+            if f != full_dest:
+                print_diff(file_list, full_dest)
+                if os.path.exists(full_dest):
+                    sys.stderr.write(colorize(
+                        "Destination already exists", RED
+                    ))
+                    continue
+
+            job_files.append((file_list, metadata))
+    else:
+        dest_files = []
+        for f, _ in file_list:
+            if os.path.isfile(f):
+                full_dest, types, messages, metadata = _process_file(f)
+
                 if types == set():
                     continue
 
@@ -192,12 +201,32 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
                     continue
                 job_files.append((f, metadata))
                 dest_files.append(full_dest)
-            except subprocess.CalledProcessError:
-                sys.stderr.write("Error on getting metadata on '%s'.\n" % f)
 
     if len(job_files) != 0 and not args.dry_run and (args.apply or confirm()):
         progress = Progress(len(job_files), args.cmds, process)
         progress.run_all(job_files)
+
+
+def _process_file(f):
+    try:
+        metadata = None
+        if args.metadata or args.view or len([
+            name for name, cmd in metatask.config.get("cmds", {}).items()
+            if cmd.get("metadata", False) is True and name in args.cmds
+        ]) > 0:
+            metadata = read_metadata(f, not args.view)
+            if args.view:
+                print(json.dumps(metadata, indent=4))
+                exit()
+
+        full_dest, extension, types, messages = process.destination_filename(
+            args.cmds, f, metadata=metadata
+        )
+
+        return full_dest, types, messages, metadata
+
+    except subprocess.CalledProcessError:
+        sys.stderr.write("Error on getting metadata on '%s'.\n" % f)
 
 
 def init(config_file):
