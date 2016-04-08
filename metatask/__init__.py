@@ -164,7 +164,7 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
                         print(json.dumps(metadata, indent=4))
                         exit()
 
-                full_dest, extension, types = process.destination_filename(
+                full_dest, extension, types, messages = process.destination_filename(
                     args.cmds, f, metadata=metadata
                 )
                 if types == set():
@@ -186,6 +186,8 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
                         continue
                 elif types != set(["rename"]):
                     print(colorize(f, BLUE))
+                    for message in messages:
+                        print(message)
                 else:
                     continue
                 job_files.append((f, metadata))

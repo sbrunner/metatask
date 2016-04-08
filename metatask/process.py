@@ -7,8 +7,9 @@ import shutil
 import threading
 import metatask
 import jinja2
+import subprocess
+import bashcolor
 from tempfile import NamedTemporaryFile
-from subprocess import check_call
 from PyQt5.QtCore import QObject, pyqtSignal
 
 
@@ -52,7 +53,7 @@ class Process(QObject):
                 cmds.append(cmd)
 
         if filename is not None:
-            dst, extension, types = self.destination_filename(names, filename, metadata=metadata)
+            dst, extension, types, messages = self.destination_filename(names, filename, metadata=metadata)
             if types == set():
                 return
             if types == set(["rename"]):
@@ -66,7 +67,7 @@ class Process(QObject):
                 return
 
         original_filename = filename
-        if cmds[0].get("inplace") is True:
+        if cmds[0].get("inplace") is True or cmd.get("type" == "metadata"):
             if in_extention is None:
                 out_name = NamedTemporaryFile(mode='w+b').name
             else:
@@ -89,6 +90,14 @@ class Process(QObject):
 
             if cmd.get('type') == 'rename':
                 destination_filename = self._rename(cmd, destination_filename, metadata)
+            if cmd.get("type" == "metadata"):
+                value = cmd.get('value_format')
+                value = self._format(
+                    filename,
+                    "^.*{}.*$".format(cmd.get("value_get")),
+                    cmd.get("value_format"),
+                )
+                subprocess.check_output(['exiftool', '-%s=%s' % (cmd.get('name'), value), filename])
             else:
                 if 'out_ext' in cmd:
                     out_ext = cmd['out_ext']
@@ -128,7 +137,7 @@ class Process(QObject):
                     return None, None
                 print("{name}: {cmd}".format(name=name, cmd=cmd_cmd))
                 self.progress.emit(no, name, cmd_cmd, cmd)
-                check_call(cmd_cmd, shell=True)
+                subprocess.check_call(cmd_cmd, shell=True)
 
                 if filename != original_filename and not inplace:
                     os.unlink(filename)
@@ -176,8 +185,15 @@ class Process(QObject):
                 destination_filename
             )
         else:
-            if cmd.get('metadata', False) is True:
-                if cmd.get('template') == 'jinja':
+            return self._format(
+                destination_filename, from_re, to_re,
+                cmd.get('metadata', False), metadata,
+                cmd.get('template')
+            )
+
+    def _format(self, destination_filename, from_re, to_re, do_metadata=False, metadata=None, template=None):
+            if metadata is True:
+                if template == 'jinja':
                     template = jinja2.Template(to_re)
                     to_re = template.render(
                         len=len, str=str,
@@ -202,6 +218,7 @@ class Process(QObject):
                 cmds.append(cmd)
 
         types = set()
+        messages = []
 
         for cmd in cmds:
             types.add(cmd.get('type'))
@@ -212,6 +229,17 @@ class Process(QObject):
                         filename = self._rename(do, filename, metadata)
                 else:
                     filename = self._rename(cmd, filename, metadata)
+            if cmd.get("type" == "metadata"):
+                value = cmd.get('value_format')
+                value = self._format(
+                    filename,
+                    "^.*{}.*$".format(cmd.get("value_get")),
+                    cmd.get("value_format"),
+                )
+                messages.append("Set the metadata '%s' to '%s'." % (
+                    bashcolor.colorize(cmd.get('name'), bashcolor.BLUE),
+                    bashcolor.colorize(value, bashcolor.GREEN)
+                ))
             else:
                 if 'out_ext' in cmd:
                     extension = cmd['out_ext']
@@ -221,4 +249,4 @@ class Process(QObject):
                 r"\.[a-z0-9A-Z]{2,5}$", "",
                 filename
             ), extension)
-        return filename, extension, types
+        return filename, extension, types, messages
