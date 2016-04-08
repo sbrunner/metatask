@@ -19,8 +19,17 @@ class Process(QObject):
     def process(
             self, names, filename=None, destination_filename=None,
             in_extention=None, get_content=False, metadata=None):
-        cmds = metatask.config.get("cmds", {})
         out_ext = in_extention
+        cmds_config = metatask.config.get("cmds", {})
+        cmds = []
+        for cmd in names:
+            if isinstance(cmd, str):
+                c = cmds_config.get(cmd)
+                if c is None:
+                    raise Exception("Missing command '%s' in `cmds`" % cmd)
+                cmds.append(c)
+            else:
+                cmds.append(cmd)
 
         if filename is not None:
             dst, extension, types = self.destination_filename(names, filename, metadata=metadata)
@@ -37,7 +46,7 @@ class Process(QObject):
                 return
 
         original_filename = filename
-        if cmds.get(names[0]).get("inplace") is True:
+        if cmds[0].get("inplace") is True:
             if in_extention is None:
                 out_name = NamedTemporaryFile(mode='w+b').name
             else:
@@ -50,8 +59,8 @@ class Process(QObject):
 
         if destination_filename is None:
             destination_filename = filename
-        for no, name in enumerate(names):
-            cmd = cmds.get(name)
+        for no, name in enumerate(cmds):
+            cmd = cmds_config.get(name)
             if cmd is None:
                 raise "Missing command '%s' in `cmds`" % name
 
@@ -153,17 +162,20 @@ class Process(QObject):
             )
 
     def destination_filename(self, names, filename, extension=None, metadata=None):
-        cmds = metatask.config.get("cmds", {})
+        cmds_config = metatask.config.get("cmds", {})
+        cmds = []
+        for cmd in names:
+            if isinstance(cmd, str):
+                c = cmds_config.get(cmd)
+                if c is None:
+                    raise Exception("Missing command '%s' in `cmds`" % cmd)
+                cmds.append(c)
+            else:
+                cmds.append(cmd)
+
         types = set()
 
-        for name in names:
-            cmd = cmds.get(name)
-            if cmd is None:  # TODO manage inline cmd
-                raise Exception("Missing command '%s' in `cmds`" % name)
-
-            if isinstance(cmd, str):
-                cmd = {}  # TODO fix
-
+        for cmd in cmds:
             types.add(cmd.get('type'))
 
             if cmd.get('type') == 'rename':

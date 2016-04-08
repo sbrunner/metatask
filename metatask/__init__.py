@@ -93,7 +93,7 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
         help='List the available cmds and exit'
     )
     parser.add_argument(
-        '--task', nargs='*', default=[],
+        '--task',
         help='task we want to do',
     )
     parser.add_argument(
@@ -124,6 +124,24 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
                 colorize(name, GREEN), cmd.get("name", "")
             ))
             exit()
+
+    cmds = []
+    cmds_config = metatask.config.get("cmds", {})
+    if args.task is not None:
+        for cmd in metatask.config.get("tasks", {}).get(args.task, {}).get("cmds", []):
+            if isinstance(cmd, str):
+                c = cmds_config.get(cmd)
+                if c is None:
+                    raise Exception("Missing command '%s' in `cmds`" % cmd)
+                cmds.append(c)
+            else:
+                cmds.append(cmd)
+    elif args.cmds:
+        for cmd in args.cmds:
+            c = cmds_config.get(cmd)
+            if c is None:
+                raise Exception("Missing command '%s' in `cmds`" % cmd)
+            cmds.append(c)
 
     for f, _ in files(
         args.directory, args.ignore_dir or
