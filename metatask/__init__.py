@@ -36,14 +36,9 @@ def main():
 Task to do:
 name: Predefined command in the config file.
 TODO:
-rename/<new name>/<flag>
-replace/<old>/<new>/<flag>
-moveto/<path>/<flag>
-movetorelatve/<path>/<flag>
-setmeta/<name>/<value>/<flag>
+rename/<old>/<new>/<flag>
 
 flags can contains:
-j => Jinja template.
 i => Perform case-insensitive matching.
 l => Make \w, \W, \b, \B, \s and \S dependent on the current locale.
 m => Multiline.
@@ -138,10 +133,20 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
                 cmds.append(cmd)
     elif args.cmds:
         for cmd in args.cmds:
-            c = cmds_config.get(cmd)
-            if c is None:
-                raise Exception("Missing command '%s' in `cmds`" % cmd)
-            cmds.append(c)
+            rename = re.match("rename/(.+)/(.*)/(.*)")
+            if rename is not None:
+                cmds.append({
+                    "display": cmd,
+                    "type": "rename",
+                    "from": rename.group(1),
+                    "to": rename.group(2),
+                    "flag": rename.goup(3)
+                })
+            else:
+                c = cmds_config.get(cmd)
+                if c is None:
+                    raise Exception("Missing command '%s' in `cmds`" % cmd)
+                cmds.append(c)
 
     for f, _ in files(
         args.directory, args.ignore_dir or
