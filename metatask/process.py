@@ -6,9 +6,29 @@ import re
 import shutil
 import threading
 import metatask
+import jinja2
 from tempfile import NamedTemporaryFile
 from subprocess import check_call
 from PyQt5.QtCore import QObject, pyqtSignal
+
+
+def format_num_on_demon(fract):
+    if fract is None:
+        return ''
+    if fract == '':
+        return ''
+    if type(fract) == int:
+        return "%02d" % fract
+    if type(fract) == dict:
+        print(fract)
+    s = fract.split("/")
+    if len(s) == 1:
+        return "%02d" % int(s[0])
+    elif len(s) == 2:
+        n, d = s
+        return ("%0" + str(len(d)) + "d") % int(n)
+    else:
+        return fract
 
 
 class Process(QObject):
@@ -88,6 +108,8 @@ class Process(QObject):
                         ).name
 
                 params = {}
+                if metadata is not None:
+                    params.update(metadata)
 
                 if filename is not None:
                     params["in"] = "'%s'" % filename.replace("'", "'\"'\"'")
@@ -154,12 +176,18 @@ class Process(QObject):
                 destination_filename
             )
         else:
-            do_metadata = cmd.get('metadata', False) is True and metadata is not None
-            return re.sub(
-                from_re,
-                to_re.format(**metadata) if do_metadata is not None else to_re,
-                destination_filename
-            )
+            if cmd.get('metadata', False) is True:
+                if cmd.get('template') == 'jinja':
+                    template = jinja2.Template(to_re)
+                    to_re = template.render(
+                        len=len, str=str,
+                        format_num_on_demon=format_num_on_demon,
+                        m=metadata, **metadata
+                    )
+                else:
+                    to_re = to_re.format(**metadata)
+
+            return re.sub(from_re, to_re, destination_filename)
 
     def destination_filename(self, names, filename, extension=None, metadata=None):
         cmds_config = metatask.config.get("cmds", {})

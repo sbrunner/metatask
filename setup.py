@@ -10,7 +10,8 @@ README = (
 )
 
 install_requires = [
-    "bashcolor"
+    "bashcolor",
+    "Jinja2",
 ]
 
 setup_requires = [
