@@ -9,7 +9,7 @@ from bashcolor import colorize, RED, GREEN, INVERSE
 
 
 def common_start(str1, str2):
-    strs []
+    strs = []
     strs += str1
     strs.append(str2)
 
@@ -36,7 +36,7 @@ def different(str_, start, end):
 
 
 def print_diff(str1, str2):
-    if not typeof(str1, list):
+    if not isinstance(str1, list):
         str1 = [str1]
     start = common_start(str1, str2)
     end = common_start([s[::-1] for s in str1], str2[::-1])[::-1]
