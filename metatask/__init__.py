@@ -85,12 +85,20 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
         help='just see the diff'
     )
     parser.add_argument(
-        '--tasks', nargs='*', default=[],
-        help='Tasks we want to do',
+        '--cmds', nargs='*', default=[],
+        help='cmds we want to do',
+    )
+    parser.add_argument(
+        '--list-cmds', action='store_true',
+        help='List the available cmds and exit'
+    )
+    parser.add_argument(
+        '--task', nargs='*', default=[],
+        help='task we want to do',
     )
     parser.add_argument(
         '--list-tasks', action='store_true',
-        help='List the available tasks'
+        help='List the available cmds and exit'
     )
     parser.add_argument(
         '--config-file', default=None,
@@ -103,8 +111,14 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
     job_files = []
     process = Process()
 
-    if args.list_tasks:
+    if args.list_cmds:
         for name, cmd in metatask.config.get("cmds", {}).items():
+            print("{}: {}".format(
+                colorize(name, GREEN), cmd.get("name", "")
+            ))
+            exit()
+    if args.list_tasks:
+        for name, cmd in metatask.config.get("tasks", {}).items():
             print("{}: {}".format(
                 colorize(name, GREEN), cmd.get("name", "")
             ))
@@ -119,7 +133,7 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
                 metadata = None
                 if args.metadata or args.view or len([
                     name for name, cmd in metatask.config.get("cmds", {}).items()
-                    if cmd.get("metadata", False) is True and name in args.tasks
+                    if cmd.get("metadata", False) is True and name in args.cmds
                 ]) > 0:
                     metadata = read_metadata(f, not args.view)
                     if args.view:
@@ -127,7 +141,7 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
                         exit()
 
                 full_dest, extension, task = process.destination_filename(
-                    args.tasks, f, metadata=metadata
+                    args.cmds, f, metadata=metadata
                 )
 
                 if f != full_dest:
@@ -153,7 +167,7 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
                 sys.stderr.write("Error on getting metadata on '%s'.\n" % f)
 
     if len(job_files) != 0 and not args.dry_run and (args.apply or confirm()):
-        progress = Progress(len(job_files), args.tasks, process)
+        progress = Progress(len(job_files), args.cmds, process)
         progress.run_all(job_files)
 
 
