@@ -109,6 +109,7 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
 
     metatask.init(args.config_file)
     job_files = []
+    dest_files = []
     process = Process()
 
     if args.list_cmds:
@@ -140,9 +141,11 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
                         print(json.dumps(metadata, indent=4))
                         exit()
 
-                full_dest, extension, task = process.destination_filename(
+                full_dest, extension, types = process.destination_filename(
                     args.cmds, f, metadata=metadata
                 )
+                if types == set():
+                    continue
 
                 if f != full_dest:
                     print_diff(f, full_dest)
@@ -152,17 +155,18 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
                         ))
                         continue
                     elif len([
-                        i for i in job_files if i[1] == full_dest
+                        i for i in dest_files if i[1] == full_dest
                     ]) != 0:
                         sys.stderr.write(colorize(
                             "Destination will already exists", RED
                         ))
                         continue
-                elif task is True:
+                elif types != set(["rename"]):
                     print(colorize(f, BLUE))
                 else:
                     continue
                 job_files.append((f, metadata))
+                dest_files.append(full_dest)
             except subprocess.CalledProcessError:
                 sys.stderr.write("Error on getting metadata on '%s'.\n" % f)
 
