@@ -8,7 +8,6 @@ import threading
 import metatask
 from tempfile import NamedTemporaryFile
 from subprocess import check_call
-from shutil import copyfile
 from PyQt5.QtCore import QObject, pyqtSignal
 
 
@@ -33,7 +32,8 @@ class Process(QObject):
                     with self.lock:
                         if not os.path.exists(directory):
                             os.makedirs(directory)
-                    shutil.move(filename, dst)
+                        if not os.path.exists(dst):
+                            shutil.move(filename, dst)
                 return
 
         original_filename = filename
@@ -99,7 +99,7 @@ class Process(QObject):
                 self.progress.emit(no, name, cmd_cmd, cmd)
                 check_call(cmd_cmd, shell=True)
 
-                if filename != original_filename:
+                if filename != original_filename and not inplace:
                     os.unlink(filename)
                 filename = out_name
 
@@ -112,8 +112,6 @@ class Process(QObject):
                     os.unlink(filename)
             return content, out_ext
         else:
-            if original_filename is not None and original_filename != filename:
-                os.unlink(original_filename)
             if out_ext is not None:
                 destination_filename = "%s.%s" % (re.sub(
                     r"\.[a-z0-9A-Z]{2,5}$", "",
@@ -124,9 +122,10 @@ class Process(QObject):
                 with self.lock:
                     if not os.path.exists(directory):
                         os.makedirs(directory)
-
-                copyfile(filename, destination_filename)
-                os.unlink(filename)
+                    if not os.path.exists(destination_filename) and filename != destination_filename:
+                        shutil.move(filename, destination_filename)
+                        if original_filename is not None and original_filename != filename:
+                            os.unlink(original_filename)
 
             return destination_filename, out_ext
 
