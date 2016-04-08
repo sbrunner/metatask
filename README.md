@@ -2,10 +2,11 @@
 
 Tools that support:
 - Runs commands on a set of files
-- Mupty process the for fast run
+- Multi process the for fast run
 - Read metadata from the file with exiftool
 - Use metadata in rename or command
 - Set metadata on the file
+- Support jinja template
 - Rename or move the file
 
 Config file `<Standard config path>/metatask.yaml`, `~/.config/metatask.yaml` on Linux
@@ -14,11 +15,11 @@ Syntax:
 ```yaml
 nb_process: <number of concurent process>
 
-chains:
+task:
     <name>:
         display: <text>
         source-mime: <mimie type>
-        commands: [<list of commands>]
+        commands: [<list of commands or command names>]
 
 cmds:
     <name>:
