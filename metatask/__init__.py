@@ -120,11 +120,13 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
             exit()
 
     merge = False
+    keep = False
     cmds = []
     cmds_config = metatask.config.get("cmds", {})
     if args.task is not None:
         task = metatask.config.get("tasks", {}).get(args.task, {})
         merge = task.get(merge, False) is True
+        keep = task.get(keep, False) is True
         for cmd in task.get("cmds", []):
             if isinstance(cmd, str):
                 c = cmds_config.get(cmd)
@@ -168,6 +170,8 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
                         "Destination already exists", RED
                     ))
                     continue
+            if keep:
+                exit("The source an the destination are the same in keep mode")
 
             job_files.append((file_list, metadata))
     else:
@@ -193,6 +197,8 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
                             "Destination will already exists", RED
                         ))
                         continue
+                if keep:
+                    exit("The source an the destination are the same in keep mode")
                 elif types != set(["rename"]):
                     print(colorize(f, BLUE))
                     for message in messages:
@@ -203,7 +209,7 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
                 dest_files.append(full_dest)
 
     if len(job_files) != 0 and not args.dry_run and (args.apply or confirm()):
-        progress = Progress(len(job_files), args.cmds, process)
+        progress = Progress(len(job_files), args.cmds, process, keep)
         progress.run_all(job_files)
 
 
@@ -238,14 +244,15 @@ def init(config_file):
 
 
 class Progress:
-    def __init__(self, nb, cmds, process):
+    def __init__(self, nb, cmds, process, keep):
         self.nb = nb
         self.no = 0
         self.cmds = cmds
         self.process = process
+        self.keep = keep
 
     def run(self, filename, metadata):
-        result = self.process.process(self.cmds, filename, metadata=metadata)
+        result = self.process.process(self.cmds, filename, metadata=metadata, keep=self.keep)
         self.no += 1
         print("%i/%i" % (self.no, self.nb))
         return result

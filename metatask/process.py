@@ -39,7 +39,8 @@ class Process(QObject):
 
     def process(
             self, names, filenames=None, destination_filename=None,
-            in_extention=None, get_content=False, metadata=None):
+            in_extention=None, get_content=False, metadata=None, keep=False):
+        is_merged = False
         out_ext = in_extention
         cmds_config = metatask.config.get("cmds", {})
         cmds = []
@@ -124,12 +125,12 @@ class Process(QObject):
                     params.update(metadata)
 
                 # it's a merge
-                if isinstance(filenames, list):
+                if not is_merged and isinstance(filenames, list):
                     params["in"] = " ".join([
                         "'%s'" % f.replace("'", "'\"'\"'") for f in filenames
                     ])
                     # do the merge only one time
-                    filenames = None
+                    is_merged = True
                 elif filename is not None:
                     params["in"] = "'%s'" % filename.replace("'", "'\"'\"'")
 
@@ -174,8 +175,13 @@ class Process(QObject):
                         os.makedirs(directory)
                     if not os.path.exists(destination_filename) and filename != destination_filename:
                         shutil.move(filename, destination_filename)
-                        if original_filename is not None and original_filename != filename:
-                            os.unlink(original_filename)
+                        if not keep:
+                            if isinstance(filenames, list):
+                                for f in filenames:
+                                    if f != filename:
+                                        os.unlink(f)
+                            elif original_filename is not None and original_filename != filename:
+                                os.unlink(original_filename)
 
             return destination_filename, out_ext
 

@@ -20,7 +20,9 @@ ignore_dir: <list of directory regexpto be ignored>
 task:
     <name>:
         display: <text>
-        source-mime: <mimie type>
+        source-mime: <mime type>
+        merge: <True|False, use to combine files, defaut is False>
+        keep: <True|False, uset to keep the source file, default is False>
         commands: [<list of commands or command names>]
 
 cmds:
