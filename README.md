@@ -15,6 +15,8 @@ Syntax:
 ```yaml
 nb_process: <number of concurent process>
 
+ignore_dir: <list of directory regexpto be ignored>
+
 task:
     <name>:
         display: <text>
