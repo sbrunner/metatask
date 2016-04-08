@@ -2,6 +2,7 @@
 
 import sys
 import os
+import re
 import json
 import yaml
 import subprocess
@@ -137,7 +138,7 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
                 cmds.append(cmd)
     elif args.cmds:
         for cmd in args.cmds:
-            rename = re.match("rename/(.+)/(.*)/(.*)")
+            rename = re.match("rename/(.+)/(.*)/(.*)", cmd)
             if rename is not None:
                 cmds.append({
                     "display": cmd,
@@ -158,27 +159,29 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
     )
     if merge:
         if os.path.isfile(f):
-            full_dest, types, messages = _process_file(f)
+            full_dest, types, messages = _process_file(f, args, process)
 
             if 'cmd' not in types:
-                exit("A merge process should have a cmd")
+                sys.stderr.write(colorize("A merge process should have a cmd", RED))
+                exit()
 
             if f != full_dest:
                 print_diff(file_list, full_dest)
                 if os.path.exists(full_dest):
                     sys.stderr.write(colorize(
-                        "Destination already exists", RED
+                        "Destination already exists\n", RED
                     ))
-                    continue
+                    exit()
             if keep:
-                exit("The source an the destination are the same in keep mode")
+                sys.stderr.write(colorize("The source an the destination are the same in keep mode", RED))
+                exit()
 
             job_files.append((file_list, metadata))
     else:
         dest_files = []
         for f, _ in file_list:
             if os.path.isfile(f):
-                full_dest, types, messages, metadata = _process_file(f)
+                full_dest, types, messages, metadata = _process_file(f, args, process)
 
                 if types == set():
                     continue
@@ -187,18 +190,19 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
                     print_diff(f, full_dest)
                     if os.path.exists(full_dest):
                         sys.stderr.write(colorize(
-                            "Destination already exists", RED
+                            "Destination already exists\n", RED
                         ))
                         continue
                     elif len([
-                        i for i in dest_files if i[1] == full_dest
+                        i for i in dest_files if i == full_dest
                     ]) != 0:
                         sys.stderr.write(colorize(
-                            "Destination will already exists", RED
+                            "Destination will already exists\n", RED
                         ))
                         continue
-                if keep:
-                    exit("The source an the destination are the same in keep mode")
+                elif keep:
+                    sys.stderr.write(colorize("The source an the destination are the same in keep mode", RED))
+                    exit()
                 elif types != set(["rename"]):
                     print(colorize(f, BLUE))
                     for message in messages:
@@ -213,7 +217,7 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
         progress.run_all(job_files)
 
 
-def _process_file(f):
+def _process_file(f, args, process):
     try:
         metadata = None
         if args.metadata or args.view or len([

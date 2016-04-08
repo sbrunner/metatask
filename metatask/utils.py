@@ -20,9 +20,13 @@ def common_start(str1, str2):
     start = ""
 
     for index in range(len(str1)):
+        continue_ = True
         for s in strs:
-            if str1[index] != str[index]:
+            if str1[index] != s[index]:
+                continue_ = False
                 break
+        if not continue_:
+            break
         start += str1[index]
 
     return start
