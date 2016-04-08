@@ -47,14 +47,14 @@ class Process(QObject):
         for cmd in names:
             if isinstance(cmd, str):
                 c = cmds_config.get(cmd)
+                c["name"] = cmd
                 if c is None:
                     raise Exception("Missing command '%s' in `cmds`" % cmd)
                 cmds.append(c)
             else:
                 cmds.append(cmd)
 
-        if isinstance(filenames, list):
-            filename = filenames[0]
+        filename = filenames[0] if isinstance(filenames, list) else filenames
 
         if filename is not None:
             dst, extension, types, messages = self.destination_filename(names, filename, metadata=metadata)
@@ -71,7 +71,7 @@ class Process(QObject):
                 return
 
         original_filename = filename
-        if cmds[0].get("inplace") is True or cmd.get("type" == "metadata"):
+        if cmds[0].get("inplace") is True or cmds[0].get("type" == "metadata"):
             if in_extention is None:
                 out_name = NamedTemporaryFile(mode='w+b').name
             else:
@@ -84,11 +84,7 @@ class Process(QObject):
 
         if destination_filename is None:
             destination_filename = filename
-        for no, name in enumerate(cmds):
-            cmd = cmds_config.get(name)
-            if cmd is None:
-                raise "Missing command '%s' in `cmds`" % name
-
+        for no, cmd in enumerate(cmds):
             if isinstance(cmd, str):
                 cmd = dict(cmd=cmd)
 
@@ -146,8 +142,8 @@ class Process(QObject):
 
                 if self.cancel is True:
                     return None, None
-                print("{name}: {cmd}".format(name=name, cmd=cmd_cmd))
-                self.progress.emit(no, name, cmd_cmd, cmd)
+                print("{name}: {cmd}".format(name=cmd["name"], cmd=cmd_cmd))
+                self.progress.emit(no, cmd["name"], cmd_cmd, cmd)
                 subprocess.check_call(cmd_cmd, shell=True)
 
                 if filename != original_filename and not inplace:

@@ -131,6 +131,7 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
         for cmd in task.get("cmds", []):
             if isinstance(cmd, str):
                 c = cmds_config.get(cmd)
+                c["name"] = cmd
                 if c is None:
                     raise Exception("Missing command '%s' in `cmds`" % cmd)
                 cmds.append(c)
@@ -141,7 +142,8 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
             rename = re.match("rename/(.+)/(.*)/(.*)", cmd)
             if rename is not None:
                 cmds.append({
-                    "display": cmd,
+                    "display": "",
+                    "name": cmd,
                     "type": "rename",
                     "from": rename.group(1),
                     "to": rename.group(2),
@@ -149,6 +151,7 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
                 })
             else:
                 c = cmds_config.get(cmd)
+                c["name"] = cmd
                 if c is None:
                     raise Exception("Missing command '%s' in `cmds`" % cmd)
                 cmds.append(c)
