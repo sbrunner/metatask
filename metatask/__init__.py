@@ -262,7 +262,7 @@ class Progress:
         print(colorize(filename, GREEN))
         result = self.process.process(self.cmds, filename, metadata=metadata, keep=self.keep)
         self.no += 1
-        print(colorize("{}/{}",format(self.no, self.nb), GREEN))
+        print(colorize("{}/{}".format(self.no, self.nb), GREEN))
         return result
 
     def run_all(self, job_files):

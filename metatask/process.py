@@ -137,7 +137,7 @@ class Process(QObject):
                     cmd_cmd = cmd_cmd.format(**params)
                 except:
                     print("Error in {name}: {cmd}, with {params}".format(
-                        name=name, cmd=cmd_cmd, params=params))
+                        name=cmd["name"], cmd=cmd_cmd, params=params))
                     raise
 
                 if self.cancel is True:
