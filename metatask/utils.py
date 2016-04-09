@@ -43,12 +43,7 @@ def print_diff(str1, str2):
     if not isinstance(str1, list):
         str1 = [str1]
     start = common_start(str1, str2)
-    end = common_start([s[::-1] for s in str1], str2[::-1])[::-1]
-
-    # Fix end that recover start ...
-    small_str = str1 if len(str1) < len(str2) else str2
-    if len(start) + len(end) > len(small_str):
-        end = end[len(start) + len(end) - len(small_str):]
+    end = common_start([s[:len(start) - 1:-1] for s in str1], str2[:len(start) - 1:-1])[::-1]
 
     for s in str1:
         print("- %s" % colorize("%s%s%s" % (

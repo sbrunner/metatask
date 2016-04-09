@@ -147,7 +147,7 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
                     "type": "rename",
                     "from": rename.group(1),
                     "to": rename.group(2),
-                    "flag": rename.goup(3)
+                    "flag": rename.group(3)
                 })
             else:
                 c = cmds_config.get(cmd)
@@ -161,8 +161,9 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
         metatask.config.get('ignore_dir', []), args.filename
     )
     if merge:
+        f = file_list[0]
         if os.path.isfile(f):
-            full_dest, types, messages = _process_file(f, args, process)
+            full_dest, types, messages = _process_file(f, args, process, cmds)
 
             if 'cmd' not in types:
                 sys.stderr.write(colorize("A merge process should have a cmd", RED))
@@ -179,12 +180,12 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
                 sys.stderr.write(colorize("The source an the destination are the same in keep mode", RED))
                 exit()
 
-            job_files.append((file_list, metadata))
+            job_files.append((file_list, None))
     else:
         dest_files = []
         for f, _ in file_list:
             if os.path.isfile(f):
-                full_dest, types, messages, metadata = _process_file(f, args, process)
+                full_dest, types, messages, metadata = _process_file(f, args, process, cmds)
 
                 if types == set():
                     continue
@@ -220,12 +221,12 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
         progress.run_all(job_files)
 
 
-def _process_file(f, args, process):
+def _process_file(f, args, process, cmds):
     try:
         metadata = None
         if args.metadata or args.view or len([
-            name for name, cmd in metatask.config.get("cmds", {}).items()
-            if cmd.get("metadata", False) is True and name in args.cmds
+            cmd for cmd in cmds
+            if cmd.get("metadata", False) is True
         ]) > 0:
             metadata = read_metadata(f, not args.view)
             if args.view:
@@ -233,7 +234,7 @@ def _process_file(f, args, process):
                 exit()
 
         full_dest, extension, types, messages = process.destination_filename(
-            args.cmds, f, metadata=metadata
+            cmds, f, metadata=metadata
         )
 
         return full_dest, types, messages, metadata
