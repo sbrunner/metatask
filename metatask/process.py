@@ -64,7 +64,7 @@ class Process(QObject):
                 if filename != dst:
                     directory = os.path.dirname(dst)
                     with self.lock:
-                        if not os.path.exists(directory):
+                        if directory != '' and not os.path.exists(directory):
                             os.makedirs(directory)
                         if not os.path.exists(dst):
                             shutil.move(filename, dst)
