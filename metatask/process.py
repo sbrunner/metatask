@@ -47,9 +47,9 @@ class Process(QObject):
         for cmd in names:
             if isinstance(cmd, str):
                 c = cmds_config.get(cmd)
-                c["name"] = cmd
                 if c is None:
                     raise Exception("Missing command '%s' in `cmds`" % cmd)
+                c["name"] = cmd
                 cmds.append(c)
             else:
                 cmds.append(cmd)

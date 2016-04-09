@@ -217,7 +217,7 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
                 dest_files.append(full_dest)
 
     if len(job_files) != 0 and not args.dry_run and (args.apply or confirm()):
-        progress = Progress(len(job_files), args.cmds, process, keep)
+        progress = Progress(len(job_files), cmds, process, keep)
         progress.run_all(job_files)
 
 
