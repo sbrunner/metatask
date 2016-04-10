@@ -110,15 +110,15 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
     if args.list_cmds:
         for name, cmd in metatask.config.get("cmds", {}).items():
             print("{}: {}".format(
-                colorize(name, GREEN), cmd.get("name", "")
+                colorize(name, GREEN), cmd.get("display", "")
             ))
-            exit()
+        exit()
     if args.list_tasks:
         for name, cmd in metatask.config.get("tasks", {}).items():
             print("{}: {}".format(
-                colorize(name, GREEN), cmd.get("name", "")
+                colorize(name, GREEN), cmd.get("display", "")
             ))
-            exit()
+        exit()
 
     merge = False
     keep = False
