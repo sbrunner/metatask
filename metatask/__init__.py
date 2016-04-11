@@ -151,9 +151,9 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
                 })
             else:
                 c = cmds_config.get(cmd)
-                c["name"] = cmd
                 if c is None:
                     raise Exception("Missing command '%s' in `cmds`" % cmd)
+                c["name"] = cmd
                 cmds.append(c)
 
     file_list = files(
