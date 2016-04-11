@@ -171,7 +171,10 @@ class Process(QObject):
                 with self.lock:
                     if not os.path.exists(directory):
                         os.makedirs(directory)
-                    if not os.path.exists(destination_filename) and filename != destination_filename:
+                    if filename != destination_filename and (
+                            len(filenames) == 1 and filenames[0] == destination_filename or  # apply a transformation on the file
+                            not os.path.exists(destination_filename)
+                    ):
                         shutil.move(filename, destination_filename)
                         if not keep:
                             if isinstance(filenames, list):
