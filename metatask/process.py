@@ -176,6 +176,10 @@ class Process(QObject):
                             len(filenames) == 1 and filenames[0] == destination_filename or
                             not os.path.exists(destination_filename)
                     ):
+                        print("{name}: {file}".format(
+                            name=bashcolor.colorize('copy', bashcolor.BLUE),
+                            file=bashcolor.colorize(destination_filename, bashcolor.YELLOW),
+                        ))
                         shutil.move(filename, destination_filename)
                         if not keep:
                             if isinstance(filenames, list):
