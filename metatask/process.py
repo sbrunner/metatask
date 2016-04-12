@@ -55,6 +55,8 @@ class Process(QObject):
                 cmds.append(cmd)
 
         filename = filenames[0] if isinstance(filenames, list) else filenames
+        if destination_filename is None:
+            destination_filename = filename
 
         if filename is not None:
             dst, extension, types, messages = self.destination_filename(names, filename, metadata=metadata)
@@ -82,8 +84,6 @@ class Process(QObject):
             shutil.copyfile(filename, out_name)
             filename = out_name
 
-        if destination_filename is None:
-            destination_filename = filename
         for no, cmd in enumerate(cmds):
             if isinstance(cmd, str):
                 cmd = dict(cmd=cmd)
@@ -210,7 +210,7 @@ class Process(QObject):
             )
 
     def _format(self, destination_filename, from_re, to_re, do_metadata=False, metadata=None, template=None):
-            if metadata is True:
+            if do_metadata is True:
                 if template == 'jinja':
                     template = jinja2.Template(to_re)
                     to_re = template.render(
