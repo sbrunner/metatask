@@ -172,6 +172,8 @@ class Process(QObject):
                     if not os.path.exists(directory):
                         os.makedirs(directory)
                     if filename != destination_filename and (
+                            # apply on new file
+                            filenames is None or
                             # apply a transformation on the file
                             len(filenames) == 1 and filenames[0] == destination_filename or
                             not os.path.exists(destination_filename)
