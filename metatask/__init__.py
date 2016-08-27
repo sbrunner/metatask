@@ -50,7 +50,7 @@ x => Verbose
 See also: https://docs.python.org/2/library/re.html#module-contents''')
     parser.add_argument(
         'directory', nargs='*', default=['.'],
-        help='root foldrers'
+        help='root folders'
     )
     parser.add_argument(
         '--ignore-dir', nargs='*', default=None,
