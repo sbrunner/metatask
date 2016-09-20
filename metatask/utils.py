@@ -58,6 +58,15 @@ def print_diff(str1, str2):
     ), GREEN))
 
 
+def split(path):
+    result = []
+    path, folder = os.path.split(path)
+    result.append(folder)
+    while path != '':
+        path, folder = os.path.split(path)
+        result.append(folder)
+    return result
+
 def files(directories, ignore_dir, filenames=['.*']):
     ignore_dir = set(ignore_dir)
     ignore_dir = [re.compile(i) for i in ignore_dir]
@@ -66,7 +75,7 @@ def files(directories, ignore_dir, filenames=['.*']):
             # for f in glob.iglob(args.directory, recursive=True):
             stop = False
             for (path, dirs, files) in os.walk(directory):
-                for p in set(os.path.split(path)):
+                for p in set(split(path)):
                     for i in ignore_dir:
                         stop = i.match(p) is not None
                         if stop:
