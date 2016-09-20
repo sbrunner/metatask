@@ -185,36 +185,39 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
         dest_files = []
         for f, _ in file_list:
             if os.path.isfile(f):
-                full_dest, types, messages, metadata = _process_file(f, args, process, cmds)
+                try:
+                    full_dest, types, messages, metadata = _process_file(f, args, process, cmds)
 
-                if types == set():
-                    continue
+                    if types == set():
+                        continue
 
-                if f != full_dest:
-                    print_diff(f, full_dest)
-                    if os.path.exists(full_dest):
-                        sys.stderr.write(colorize(
-                            "Destination already exists\n", RED
-                        ))
+                    if f != full_dest:
+                        print_diff(f, full_dest)
+                        if os.path.exists(full_dest):
+                            sys.stderr.write(colorize(
+                                "Destination already exists\n", RED
+                            ))
+                            continue
+                        elif len([
+                            i for i in dest_files if i == full_dest
+                        ]) != 0:
+                            sys.stderr.write(colorize(
+                                "Destination will already exists\n", RED
+                            ))
+                            continue
+                    elif keep:
+                        sys.stderr.write(colorize("The source and the destination are the same in keep mode\n", RED))
+                        exit()
+                    elif types != set(["rename"]):
+                        print(colorize(f, BLUE))
+                        for message in messages:
+                            print(message)
+                    else:
                         continue
-                    elif len([
-                        i for i in dest_files if i == full_dest
-                    ]) != 0:
-                        sys.stderr.write(colorize(
-                            "Destination will already exists\n", RED
-                        ))
-                        continue
-                elif keep:
-                    sys.stderr.write(colorize("The source an the destination are the same in keep mode", RED))
-                    exit()
-                elif types != set(["rename"]):
-                    print(colorize(f, BLUE))
-                    for message in messages:
-                        print(message)
-                else:
-                    continue
-                job_files.append((f, metadata))
-                dest_files.append(full_dest)
+                    job_files.append((f, metadata))
+                    dest_files.append(full_dest)
+                except Exception as e:
+                    sys.stderr.write(colorize("Error while processing the file '{}': '{}'\n".format(f, str(e)), RED))
 
     if len(job_files) != 0 and not args.dry_run and (args.apply or confirm()):
         progress = Progress(len(job_files), cmds, process, keep)
