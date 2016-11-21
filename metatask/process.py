@@ -183,7 +183,7 @@ class Process(QObject):
                             file=bashcolor.colorize(destination_filename, bashcolor.YELLOW),
                         ))
                         shutil.move(filename, destination_filename)
-                        if not keep:
+                        if not keep and original_filename != destination_filename:
                             if isinstance(filenames, list):
                                 for f in filenames:
                                     if f != filename:

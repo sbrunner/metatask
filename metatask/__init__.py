@@ -264,7 +264,7 @@ class Progress:
 
     def run(self, filename, metadata):
         print(colorize(filename, GREEN))
-        result = self.process.process(self.cmds, filename, metadata=metadata, keep=self.keep)
+        result = self.process.process(self.cmds, [filename], metadata=metadata, keep=self.keep)
         self.no += 1
         print(colorize("{}/{}".format(self.no, self.nb), GREEN))
         return result
