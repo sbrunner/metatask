@@ -169,7 +169,7 @@ class Process(QObject):
             if filename != destination_filename:
                 directory = os.path.dirname(destination_filename)
                 with self.lock:
-                    if not os.path.exists(directory):
+                    if directory != "" and not os.path.exists(directory):
                         os.makedirs(directory)
                     if filename != destination_filename and (
                             # apply on new file
