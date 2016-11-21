@@ -61,7 +61,7 @@ class Process(QObject):
         if filename is not None:
             dst, extension, types, messages = self.destination_filename(names, filename, metadata=metadata)
             if types == set():
-                return
+                return None, None
             if types == set(["rename"]):
                 if filename != dst:
                     directory = os.path.dirname(dst)
@@ -70,7 +70,7 @@ class Process(QObject):
                             os.makedirs(directory)
                         if not os.path.exists(dst):
                             shutil.move(filename, dst)
-                return
+                return None, None
 
         original_filename = filename
         if cmds[0].get("inplace") is True or cmds[0].get("type" == "metadata"):
