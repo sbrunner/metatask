@@ -133,7 +133,7 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
                 c = cmds_config.get(cmd)
                 c["name"] = cmd
                 if c is None:
-                    raise Exception("Missing command '%s' in `cmds`" % cmd)
+                    raise Exception("Missing command '{0!s}' in `cmds`".format(cmd))
                 cmds.append(c)
             else:
                 cmds.append(cmd)
@@ -152,7 +152,7 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
             else:
                 c = cmds_config.get(cmd)
                 if c is None:
-                    raise Exception("Missing command '%s' in `cmds`" % cmd)
+                    raise Exception("Missing command '{0!s}' in `cmds`".format(cmd))
                 c["name"] = cmd
                 cmds.append(c)
 
@@ -249,7 +249,7 @@ def _process_file(f, args, process, cmds):
         return full_dest, types, messages, metadata
 
     except subprocess.CalledProcessError:
-        sys.stderr.write("Error on getting metadata on '%s'.\n" % f)
+        sys.stderr.write("Error on getting metadata on '{0!s}'.\n".format(f))
 
 
 def init(config_file):
