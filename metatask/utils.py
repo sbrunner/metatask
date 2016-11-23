@@ -67,7 +67,10 @@ def split(path):
         result.append(folder)
     return result
 
-def files(directories, ignore_dir, filenames=['.*']):
+
+def files(directories, ignore_dir, filenames=None):
+    if filenames is None:
+        filenames = ['.*']
     ignore_dir = set(ignore_dir)
     ignore_dir = [re.compile(i) for i in ignore_dir]
     for directory in directories:

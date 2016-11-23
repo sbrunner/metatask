@@ -206,7 +206,10 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
                             ))
                             continue
                     elif keep:
-                        sys.stderr.write(colorize("The source and the destination are the same in keep mode\n", RED))
+                        sys.stderr.write(colorize(
+                            "The source and the destination are the same in keep mode\n",
+                            RED
+                        ))
                         exit()
                     elif types != set(["rename"]):
                         print(colorize(f, BLUE))
@@ -217,7 +220,10 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
                     job_files.append((f, metadata))
                     dest_files.append(full_dest)
                 except Exception as e:
-                    sys.stderr.write(colorize("Error while processing the file '{}': '{}'\n".format(f, str(e)), RED))
+                    sys.stderr.write(colorize(
+                        "Error while processing the file '{}': '{}'\n".format(f, str(e)),
+                        RED
+                    ))
 
     if len(job_files) != 0 and not args.dry_run and (args.apply or confirm()):
         progress = Progress(len(job_files), cmds, process, keep)
@@ -280,6 +286,7 @@ class Progress:
             for feature in as_completed(future_results):
                 feature.result()
                 pass
+
 
 if __name__ == "__main__":
     main()
