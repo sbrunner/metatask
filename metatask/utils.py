@@ -46,16 +46,16 @@ def print_diff(str1, str2):
     end = common_start([s[:len(start) - 1:-1] for s in str1], str2[:len(start) - 1:-1])[::-1]
 
     for s in str1:
-        print("- %s" % colorize("%s%s%s" % (
+        print("- {0!s}".format(colorize("{0!s}{1!s}{2!s}".format(
             start,
             colorize(different(s, start, end), effects=[INVERSE]),
-            end,
-        ), RED))
-    print("+ %s" % colorize("%s%s%s" % (
+            end
+        ), RED)))
+    print("+ {0!s}".format(colorize("{0!s}{1!s}{2!s}".format(
         start,
         colorize(different(str2, start, end), effects=[INVERSE]),
-        end,
-    ), GREEN))
+        end
+    ), GREEN)))
 
 
 def split(path):
@@ -122,9 +122,9 @@ def confirm(prompt=None, resp=False):
         prompt = "Confirm"
 
     if resp:
-        prompt = "%s [%s]|%s: " % (prompt, "y", "n")
+        prompt = "{0!s} [{1!s}]|{2!s}: ".format(prompt, "y", "n")
     else:
-        prompt = "%s [%s]|%s: " % (prompt, "n", "y")
+        prompt = "{0!s} [{1!s}]|{2!s}: ".format(prompt, "n", "y")
 
     while True:
         ans = input(prompt)
