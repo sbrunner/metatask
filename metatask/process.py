@@ -215,7 +215,8 @@ class Process(QObject):
                 cmd.get('template')
             )
 
-    def _format(self, destination_filename, from_re, to_re, do_metadata=False, metadata=None, template=None):
+    @staticmethod
+    def _format(destination_filename, from_re, to_re, do_metadata=False, metadata=None, template=None):
             if do_metadata is True:
                 if template == 'jinja':
                     template = jinja2.Template(to_re)
