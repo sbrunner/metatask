@@ -140,12 +140,12 @@ class Process(QObject):
                         name=cmd["name"], cmd=cmd_cmd, params=params))
                     raise
 
+                self.progress.emit(no, cmd["name"], cmd_cmd, cmd)
                 if self.cancel is True:
                     return None, None
                 print("{name}: {cmd}".format(
                     name=bashcolor.colorize(cmd["name"], bashcolor.BLUE), cmd=cmd_cmd
                 ))
-                self.progress.emit(no, cmd["name"], cmd_cmd, cmd)
                 subprocess.check_call(cmd_cmd, shell=True)
 
                 if filename != original_filename and not inplace:
