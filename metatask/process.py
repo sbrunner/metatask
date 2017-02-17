@@ -59,7 +59,7 @@ class Process(QObject):
             destination_filename = filename
 
         if filename is not None:
-            dst, _, types, messages = self.destination_filename(names, filename, metadata=metadata)
+            dst, _, types, _ = self.destination_filename(names, filename, metadata=metadata)
             if types == set():
                 return None, None
             if types == set(["rename"]):
