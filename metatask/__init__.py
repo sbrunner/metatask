@@ -257,7 +257,7 @@ def init(config_file):
     if config_file is None:
         config_file = CONFIG_PATH
     with open(config_file) as f:
-        config = yaml.load(f.read())
+        config = yaml.safe_load(f.read())
 
 
 class Progress:
