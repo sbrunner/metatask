@@ -19,15 +19,15 @@ def common_start(str1, str2):
 
     start = ""
 
-    for index in range(len(str1)):
+    for index, str1_ in enumerate(str1):
         continue_ = True
         for s in strs:
-            if str1[index] != s[index]:
+            if str1_ != s[index]:
                 continue_ = False
                 break
         if not continue_:
             break
-        start += str1[index]
+        start += str1_
 
     return start
 
@@ -77,7 +77,7 @@ def files(directories, ignore_dir, filenames=None):
         if os.path.isdir(directory):
             # for f in glob.iglob(args.directory, recursive=True):
             stop = False
-            for (path, dirs, files) in os.walk(directory):
+            for path, _, files in os.walk(directory):
                 for p in set(split(path)):
                     for i in ignore_dir:
                         stop = i.match(p) is not None
@@ -145,7 +145,7 @@ def read_metadata(filename, read_types=True):
     ]), encoding='utf-8', errors='strict'))[0]
     if read_types is True:
         for k in metadata.keys():
-            if type(metadata[k]) == str:
+            if isinstance(metadata[k], str):
                 try:
                     metadata[k] = datetime.datetime.strptime(
                         metadata[k], "%Y:%m:%d %H:%M:%S"

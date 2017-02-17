@@ -18,9 +18,9 @@ def format_num_on_demon(fract):
         return ''
     if fract == '':
         return ''
-    if type(fract) == int:
+    if isinstance(fract, int):
         return "{0:02d}".format(fract)
-    if type(fract) == dict:
+    if isinstance(fract, dict):
         print(fract)
     s = fract.split("/")
     if len(s) == 1:
@@ -59,7 +59,7 @@ class Process(QObject):
             destination_filename = filename
 
         if filename is not None:
-            dst, extension, types, messages = self.destination_filename(names, filename, metadata=metadata)
+            dst, _, types, messages = self.destination_filename(names, filename, metadata=metadata)
             if types == set():
                 return None, None
             if types == set(["rename"]):

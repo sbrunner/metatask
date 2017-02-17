@@ -242,7 +242,7 @@ def _process_file(f, args, process, cmds):
                 print(json.dumps(metadata, indent=4))
                 exit()
 
-        full_dest, extension, types, messages = process.destination_filename(
+        full_dest, _, types, messages = process.destination_filename(
             cmds, f, metadata=metadata
         )
 
@@ -285,7 +285,6 @@ class Progress:
             }
             for feature in as_completed(future_results):
                 feature.result()
-                pass
 
 
 if __name__ == "__main__":
