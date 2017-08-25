@@ -93,6 +93,10 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
         help='task we want to do',
     )
     parser.add_argument(
+        '--delete-size', action='store_true',
+        help='delete source if the destination has the same size',
+    )
+    parser.add_argument(
         '--list-tasks', action='store_true',
         help='List the available cmds and exit'
     )
@@ -197,6 +201,16 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
                             sys.stderr.write(colorize(
                                 "Destination already exists\n", RED
                             ))
+                            if args.delete_size and os.path.getsize(f) == os.path.getsize(full_dest):
+                                if args.apply:
+                                    os.remove(f)
+                                    sys.stderr.write(colorize(
+                                        "The source file is deleted\n", RED
+                                    ))
+                                else:
+                                    sys.stderr.write(colorize(
+                                        "The source file will be removed with the --apply argument\n", RED
+                                    ))
                             continue
                         elif len([
                             i for i in dest_files if i == full_dest
