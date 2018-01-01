@@ -90,14 +90,14 @@ class Process(QObject):
 
             if cmd.get('type') == 'rename':
                 destination_filename = self._rename(cmd, destination_filename, metadata)
-            if cmd.get("type" == "metadata"):
+            if cmd.get("type") == "metadata":
                 value = cmd.get('value_format')
                 value = self._format(
                     filename,
-                    "^.*{}.*$".format(cmd.get("value_get")),
+                    cmd.get("value_get"),
                     cmd.get("value_format"),
                 )
-                subprocess.check_output(['exiftool', '-{0!s}={1!s}'.format(cmd.get('name'), value), filename])
+                subprocess.check_output(['exiftool', '-{0!s}={1!s}'.format(cmd.get('tag'), value), filename])
             else:
                 if 'out_ext' in cmd:
                     out_ext = cmd['out_ext']

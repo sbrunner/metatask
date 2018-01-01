@@ -156,7 +156,7 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
             else:
                 c = cmds_config.get(cmd)
                 if c is None:
-                    raise Exception("Missing command '{0!s}' in `cmds`".format(cmd))
+                    raise Exception("Missing command '{}' in `cmds`".format(cmd))
                 c["name"] = cmd
                 cmds.append(c)
 
