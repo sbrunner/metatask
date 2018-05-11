@@ -155,7 +155,7 @@ class Process(QObject):
         if get_content:
             content = None
             if os.path.exists(filename):
-                with open(filename) as f:
+                with open(filename, encoding='utf-8') as f:
                     content = f.read()
                 if original_filename is None or original_filename != filename:
                     os.unlink(filename)

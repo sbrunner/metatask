@@ -270,7 +270,7 @@ def init(config_file):
     global config
     if config_file is None:
         config_file = CONFIG_PATH
-    with open(config_file) as f:
+    with open(config_file, encoding='utf-8') as f:
         config = yaml.safe_load(f.read())
 
 
