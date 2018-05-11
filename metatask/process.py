@@ -135,7 +135,7 @@ class Process(QObject):
 
                 try:
                     cmd_cmd = cmd_cmd.format(**params)
-                except:
+                except Exception as e:
                     print("Error in {name}: {cmd}, with {params}".format(
                         name=cmd["name"], cmd=cmd_cmd, params=params))
                     raise
