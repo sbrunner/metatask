@@ -22,7 +22,7 @@ tests_require = install_requires + [
 
 setup(
     name="metatask",
-    version="1.0.1",
+    version="1.0.2",
     description="A tool and library to run task or moves on many files",
     long_description=README,
     classifiers=[
