@@ -91,7 +91,7 @@ def files(directories, ignore_dir, filenames=None):
                     for filename in filenames:
                         if re.match(filename, f_):
                             full_path = re.sub(
-                                "^\./", "", os.path.join(path, f_)
+                                r"^\./", "", os.path.join(path, f_)
                             )
                             yield full_path, f_
                             break

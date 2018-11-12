@@ -41,10 +41,10 @@ rename/<old>/<new>/<flag>
 
 flags can contains:
 i => Perform case-insensitive matching.
-l => Make \w, \W, \b, \B, \s and \S dependent on the current locale.
+l => Make \\w, \\W, \\b, \\B, \\s and \\S dependent on the current locale.
 m => Multiline.
 s => Make the '.' special character match any character at all.
-u => Make \w, \W, \b, \B, \d, \D, \s and \S '''
+u => Make \\w, \\W, \\b, \\B, \\d, \\D, \\s and \\S '''
         '''dependent on the Unicode character properties database.
 x => Verbose
 See also: https://docs.python.org/2/library/re.html#module-contents''')
