@@ -217,18 +217,18 @@ class Process(QObject):
 
     @staticmethod
     def _format(destination_filename, from_re, to_re, do_metadata=False, metadata=None, template=None):
-            if do_metadata is True:
-                if template == 'jinja':
-                    template = jinja2.Template(to_re)
-                    to_re = template.render(
-                        len=len, str=str,
-                        format_num_on_demon=format_num_on_demon,
-                        m=metadata, **metadata
-                    )
-                else:
-                    to_re = to_re.format(**metadata)
+        if do_metadata is True:
+            if template == 'jinja':
+                template = jinja2.Template(to_re)
+                to_re = template.render(
+                    len=len, str=str,
+                    format_num_on_demon=format_num_on_demon,
+                    m=metadata, **metadata
+                )
+            else:
+                to_re = to_re.format(**metadata)
 
-            return re.sub(from_re, to_re, destination_filename)
+        return re.sub(from_re, to_re, destination_filename)
 
     def destination_filename(self, names, filename, extension=None, metadata=None):
         cmds_config = metatask.config.get("cmds", {})
