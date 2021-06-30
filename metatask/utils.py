@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import os
 import re
 import json
@@ -46,12 +44,12 @@ def print_diff(str1, str2):
     end = common_start([s[:len(start) - 1:-1] for s in str1], str2[:len(start) - 1:-1])[::-1]
 
     for s in str1:
-        print("- {0!s}".format(colorize("{0!s}{1!s}{2!s}".format(
+        print("- {!s}".format(colorize("{!s}{!s}{!s}".format(
             start,
             colorize(different(s, start, end), effects=[INVERSE]),
             end
         ), RED)))
-    print("+ {0!s}".format(colorize("{0!s}{1!s}{2!s}".format(
+    print("+ {!s}".format(colorize("{!s}{!s}{!s}".format(
         start,
         colorize(different(str2, start, end), effects=[INVERSE]),
         end
@@ -122,9 +120,9 @@ def confirm(prompt=None, resp=False):
         prompt = "Confirm"
 
     if resp:
-        prompt = "{0!s} [{1!s}]|{2!s}: ".format(prompt, "y", "n")
+        prompt = "{!s} [{!s}]|{!s}: ".format(prompt, "y", "n")
     else:
-        prompt = "{0!s} [{1!s}]|{2!s}: ".format(prompt, "n", "y")
+        prompt = "{!s} [{!s}]|{!s}: ".format(prompt, "n", "y")
 
     while True:
         ans = input(prompt)

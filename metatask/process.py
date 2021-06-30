@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import os
 import re
 import shutil
@@ -19,12 +16,12 @@ def format_num_on_demon(fract):
     if fract == '':
         return ''
     if isinstance(fract, int):
-        return "{0:02d}".format(fract)
+        return f"{fract:02d}"
     if isinstance(fract, dict):
         print(fract)
     s = fract.split("/")
     if len(s) == 1:
-        return "{0:02d}".format(int(s[0]))
+        return f"{int(s[0]):02d}"
     elif len(s) == 2:
         n, d = s
         return ("%0" + str(len(d)) + "d") % int(n)
@@ -48,7 +45,7 @@ class Process(QObject):
             if isinstance(cmd, str):
                 c = cmds_config.get(cmd)
                 if c is None:
-                    raise Exception("Missing command '{0!s}' in `cmds`".format(cmd))
+                    raise Exception(f"Missing command '{cmd!s}' in `cmds`")
                 c["name"] = cmd
                 cmds.append(c)
             else:
@@ -62,7 +59,7 @@ class Process(QObject):
             dst, _, types, _ = self.destination_filename(names, filename, metadata=metadata)
             if types == set():
                 return None, None
-            if types == set(["rename"]):
+            if types == {"rename"}:
                 if filename != dst:
                     directory = os.path.dirname(dst)
                     with self.lock:
@@ -97,7 +94,7 @@ class Process(QObject):
                     cmd.get("value_get"),
                     cmd.get("value_format"),
                 )
-                subprocess.check_output(['exiftool', '-{0!s}={1!s}'.format(cmd.get('tag'), value), filename])
+                subprocess.check_output(['exiftool', '-{!s}={!s}'.format(cmd.get('tag'), value), filename])
             else:
                 if 'out_ext' in cmd:
                     out_ext = cmd['out_ext']
@@ -123,15 +120,15 @@ class Process(QObject):
                 # it's a merge
                 if not is_merged and isinstance(filenames, list):
                     params["in"] = " ".join([
-                        "'{0!s}'".format(f.replace("'", "'\"'\"'")) for f in filenames
+                        "'{!s}'".format(f.replace("'", "'\"'\"'")) for f in filenames
                     ])
                     # do the merge only one time
                     is_merged = True
                 elif filename is not None:
-                    params["in"] = "'{0!s}'".format(filename.replace("'", "'\"'\"'"))
+                    params["in"] = "'{!s}'".format(filename.replace("'", "'\"'\"'"))
 
                 if not inplace:
-                    params["out"] = "'{0!s}'".format(out_name.replace("'", "'\"'\"'"))
+                    params["out"] = "'{!s}'".format(out_name.replace("'", "'\"'\"'"))
 
                 try:
                     cmd_cmd = cmd_cmd.format(**params)
@@ -162,7 +159,7 @@ class Process(QObject):
             return content, out_ext
         else:
             if out_ext is not None:
-                destination_filename = "{0!s}.{1!s}".format(re.sub(
+                destination_filename = "{!s}.{!s}".format(re.sub(
                     r"\.[a-z0-9A-Z]{2,5}$", "",
                     destination_filename
                 ), out_ext)
@@ -237,7 +234,7 @@ class Process(QObject):
             if isinstance(cmd, str):
                 c = cmds_config.get(cmd)
                 if c is None:
-                    raise Exception("Missing command '{0!s}' in `cmds`".format(cmd))
+                    raise Exception(f"Missing command '{cmd!s}' in `cmds`")
                 cmds.append(c)
             else:
                 cmds.append(cmd)
@@ -261,7 +258,7 @@ class Process(QObject):
                     "^.*{}.*$".format(cmd.get("value_get")),
                     cmd.get("value_format"),
                 )
-                messages.append("Set the metadata '{0!s}' to '{1!s}'.".format(
+                messages.append("Set the metadata '{!s}' to '{!s}'.".format(
                     bashcolor.colorize(cmd.get('name'), bashcolor.BLUE),
                     bashcolor.colorize(value, bashcolor.GREEN)
                 ))
@@ -270,7 +267,7 @@ class Process(QObject):
                     extension = cmd['out_ext']
 
         if extension is not None:
-            filename = "{0!s}.{1!s}".format(re.sub(
+            filename = "{!s}.{!s}".format(re.sub(
                 r"\.[a-z0-9A-Z]{2,5}$", "",
                 filename
             ), extension)

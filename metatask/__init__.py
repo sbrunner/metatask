@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import sys
 import os
 import re
@@ -137,7 +135,7 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
                 c = cmds_config.get(cmd)
                 c["name"] = cmd
                 if c is None:
-                    raise Exception("Missing command '{0!s}' in `cmds`".format(cmd))
+                    raise Exception(f"Missing command '{cmd!s}' in `cmds`")
                 cmds.append(c)
             else:
                 cmds.append(cmd)
@@ -156,7 +154,7 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
             else:
                 c = cmds_config.get(cmd)
                 if c is None:
-                    raise Exception("Missing command '{}' in `cmds`".format(cmd))
+                    raise Exception(f"Missing command '{cmd}' in `cmds`")
                 c["name"] = cmd
                 cmds.append(c)
 
@@ -225,7 +223,7 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
                             RED
                         ))
                         exit()
-                    elif types != set(["rename"]):
+                    elif types != {"rename"}:
                         print(colorize(f, BLUE))
                         for message in messages:
                             print(message)
@@ -235,7 +233,7 @@ See also: https://docs.python.org/2/library/re.html#module-contents''')
                     dest_files.append(full_dest)
                 except Exception as e:
                     sys.stderr.write(colorize(
-                        "Error while processing the file '{}': '{}'\n".format(f, str(e)),
+                        f"Error while processing the file '{f}': '{str(e)}'\n",
                         RED
                     ))
 
@@ -263,7 +261,7 @@ def _process_file(f, args, process, cmds):
         return full_dest, types, messages, metadata
 
     except subprocess.CalledProcessError:
-        sys.stderr.write("Error on getting metadata on '{0!s}'.\n".format(f))
+        sys.stderr.write(f"Error on getting metadata on '{f!s}'.\n")
 
 
 def init(config_file):
@@ -286,7 +284,7 @@ class Progress:
         print(colorize(filename, GREEN))
         result = self.process.process(self.cmds, [filename], metadata=metadata, keep=self.keep)
         self.no += 1
-        print(colorize("{}/{}".format(self.no, self.nb), GREEN))
+        print(colorize(f"{self.no}/{self.nb}", GREEN))
         return result
 
     def run_all(self, job_files):
